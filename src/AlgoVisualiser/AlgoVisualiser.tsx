@@ -8,6 +8,7 @@ import {
   StepBack,
   StepForward,
 } from "lucide-react";
+import useQuickSort from "./algorithm/quickSort";
 
 export interface DataBar {
   value: number;
@@ -22,6 +23,7 @@ const AlgoVisualiser = () => {
   const [speed, setSpeed] = useState(1);
   const [paused, setPaused] = useState(false);
 
+  const dataRef = useRef(data);
   const speedRef = useRef(speed);
   const sortingRef = useRef({ stop: false });
   const pausedRef = useRef(paused);
@@ -42,10 +44,13 @@ const AlgoVisualiser = () => {
       coloured: false,
     }));
     setData(newData);
+    dataRef.current = newData;
+
     setSteps([newData]);
     totalStepsRef.current = 1;
-    currentStepRef.current = 1;
+
     setCurrentStep(0);
+    currentStepRef.current = 0;
   };
 
   useEffect(() => {
@@ -64,7 +69,7 @@ const AlgoVisualiser = () => {
   //     setSteps,
   //   });
   // }, [data, speedRef, sortingRef, pausedRef, setData, setSteps]);
-  const handleBubbleSort = useBubbleSort({
+  const bubbleSort = useBubbleSort({
     data,
     currentStepRef,
     totalStepsRef,
@@ -76,9 +81,27 @@ const AlgoVisualiser = () => {
     setCurrentStep,
   });
 
-  const handleSort = () => {
+  const quickSort = useQuickSort({
+    data,
+    currentStepRef,
+    totalStepsRef,
+    speedRef,
+    sortingRef,
+    pausedRef,
+    setData,
+    setSteps,
+    setCurrentStep,
+  });
+
+  // TODO: Any sort pressed while other active, randomise data and restart
+  const handleBubbleSort = () => {
     sortingRef.current.stop = false;
-    handleBubbleSort();
+    bubbleSort();
+  };
+
+  const handleQuickSort = () => {
+    sortingRef.current.stop = false;
+    quickSort();
   };
 
   const handlePause = () => {
@@ -87,10 +110,7 @@ const AlgoVisualiser = () => {
     pausedRef.current = !currentValue;
   };
 
-  // TODO: Currently the last two swapped bars remain coloured.
-  // The state isn't coloured, but I believe the render stopped one short
-  // from the last image?
-
+  // TODO: Componentise a lot to prevent repetition
   const handleStepBackward = () => {
     const newStep = currentStep - 1;
     setCurrentStep(newStep);
@@ -121,13 +141,17 @@ const AlgoVisualiser = () => {
         <h1>Algo Visualiser</h1>
         <button onClick={randomizeData}>Randomize Data</button>
         <div>
-          <button onClick={handleSort}>Bubble Sort</button>
+          <button onClick={handleBubbleSort}>Bubble Sort</button>
+        </div>
+        <div>
+          <button onClick={handleQuickSort}>Quick Sort</button>
         </div>
         <div>
           Size:{" "}
           <input
             type="range"
-            min={0}
+            defaultValue={10}
+            min={10}
             max={150}
             value={size}
             onChange={(e) => setSize(Number(e.target.value))}
@@ -137,7 +161,8 @@ const AlgoVisualiser = () => {
           Speed:{" "}
           <input
             type="range"
-            min={5}
+            defaultValue={1}
+            min={1}
             max={50}
             value={speed}
             onChange={(e) => setSpeed(Number(e.target.value))}

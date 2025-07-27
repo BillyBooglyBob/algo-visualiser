@@ -2,7 +2,7 @@ import type React from "react";
 import type { DataBar } from "../AlgoVisualiser";
 import { sleep } from "../util";
 
-interface BubbleSortProps {
+interface useBubbleSortProps {
   data: DataBar[];
   currentStepRef: React.RefObject<number>;
   totalStepsRef: React.RefObject<number>;
@@ -24,7 +24,7 @@ const useBubbleSort = ({
   setData,
   setSteps,
   setCurrentStep,
-}: BubbleSortProps) => {
+}: useBubbleSortProps) => {
   // Deep clone (create separate copy so as to not directly modify data without
   // using useState)
   // - Can make bugs harder to debug (since React doesn't re-render when state
@@ -32,7 +32,7 @@ const useBubbleSort = ({
   // - React can skip render, since it only re-renders when triggered through useState
   const arr = [...data].map((bar) => ({ ...bar }));
 
-  const bubbleSortAlgorithm = async (
+  const bubbleSort = async (
     arr: DataBar[],
     changeArr: (newArr: DataBar[]) => void
   ) => {
@@ -61,18 +61,9 @@ const useBubbleSort = ({
 
             setCurrentStep(currentStepRef.current + 1);
             currentStepRef.current += 1;
-            console.log(
-              `Inside while loop Current step: ${
-                currentStepRef.current
-              }, total steps: ${totalStepsRef.current - 1}`
-            );
 
             await sleep(100 / speedRef.current);
           }
-
-          console.log(
-            `Current step: ${currentStepRef.current}, total steps: ${totalStepsRef.current}`
-          );
 
           // Swap
           [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
@@ -85,18 +76,6 @@ const useBubbleSort = ({
 
           setSteps((prev) => [...prev, newArr]);
           totalStepsRef.current += 1;
-
-          //
-          /**
-           * TODO: when paused and stepped back or forward,
-           * the steps start from the modified point. So even if
-           * there are 200 steps, current step is 60.
-           * If we are finished, it still only displays step 60 instead
-           * of the finished 200.
-           * So add extra condition, if the current step lower than
-           * total steps, just continue adding steps until they match
-           * before continuing the sort.
-           */
           setCurrentStep((prev) => prev + 1);
           currentStepRef.current += 1;
 
@@ -116,7 +95,7 @@ const useBubbleSort = ({
   };
 
   const handleSort = () => {
-    bubbleSortAlgorithm(arr, (newData: DataBar[]) => setData(newData));
+    bubbleSort(arr, (newData: DataBar[]) => setData(newData));
   };
 
   return handleSort;
