@@ -1,6 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import useBubbleSort from "./algorithm/bubbleSort";
-import { Pause, Play, StepBack, StepForward } from "lucide-react";
+import {
+  Pause,
+  Play,
+  SkipBack,
+  SkipForward,
+  StepBack,
+  StepForward,
+} from "lucide-react";
 
 export interface DataBar {
   value: number;
@@ -26,8 +33,9 @@ const AlgoVisualiser = () => {
   }, [speed]);
 
   const randomizeData = () => {
-    sortingRef.current.stop = true;
+    setPaused(false);
     pausedRef.current = false;
+    sortingRef.current.stop = true;
 
     const newData = Array.from({ length: size }, () => ({
       value: Math.floor(Math.random() * 150) + 1,
@@ -36,6 +44,7 @@ const AlgoVisualiser = () => {
     setData(newData);
     setSteps([newData]);
     totalStepsRef.current = 1;
+    currentStepRef.current = 1;
     setCurrentStep(0);
   };
 
@@ -78,15 +87,32 @@ const AlgoVisualiser = () => {
     pausedRef.current = !currentValue;
   };
 
+  // TODO: Currently the last two swapped bars remain coloured.
+  // The state isn't coloured, but I believe the render stopped one short
+  // from the last image?
+
   const handleStepBackward = () => {
     const newStep = currentStep - 1;
     setCurrentStep(newStep);
     currentStepRef.current = newStep;
   };
+
   const handleStepForward = () => {
     const newStep = currentStep + 1;
     setCurrentStep(newStep);
     currentStepRef.current = newStep;
+  };
+
+  const handleStepToStart = () => {
+    setCurrentStep(0);
+    currentStepRef.current = 0;
+  };
+
+  // Why -2?
+  // Is it because the loop also triggered another one?
+  const handleStepToEnd = () => {
+    setCurrentStep(totalStepsRef.current - 2);
+    currentStepRef.current = totalStepsRef.current - 2;
   };
 
   return (
@@ -111,13 +137,20 @@ const AlgoVisualiser = () => {
           Speed:{" "}
           <input
             type="range"
-            min={1}
+            min={5}
             max={50}
             value={speed}
             onChange={(e) => setSpeed(Number(e.target.value))}
           />
         </div>
         <div>
+          <button
+            onClick={handleStepToStart}
+            disabled={!paused || currentStep === 0}
+            className={`${(!paused || currentStep === 0) && "brightness-50"}`}
+          >
+            <SkipBack />
+          </button>
           <button
             onClick={handleStepBackward}
             disabled={!paused || currentStep === 0}
@@ -143,11 +176,22 @@ const AlgoVisualiser = () => {
           >
             <StepForward />
           </button>
+          <button
+            onClick={handleStepToEnd}
+            disabled={!paused || currentStep === steps.length - 1}
+            className={`${
+              (!paused || currentStep === steps.length - 1) && "brightness-50"
+            }`}
+          >
+            <SkipForward />
+          </button>
           <div>
             Current step: {currentStep + 1} <br />
             Total steps: {steps.length} <br />
             Mismtach in steps:{" "}
-            {currentStep < steps.length - 1 ? "true" : "false"}
+            {currentStep < steps.length - 1 ? "true" : "false"} <br />
+            Paused: {paused ? "true" : "false"} <br />
+            Paused ref: {pausedRef.current ? "true" : "false"}
           </div>
         </div>
       </header>

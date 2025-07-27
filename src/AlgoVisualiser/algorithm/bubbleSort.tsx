@@ -54,6 +54,11 @@ const useBubbleSort = ({
 
           // Bring sort up to latest image before proceeding
           while (currentStepRef.current < totalStepsRef.current - 1) {
+            // Pause on flag
+            while (pausedRef.current) {
+              await sleep(50);
+            }
+
             setCurrentStep(currentStepRef.current + 1);
             currentStepRef.current += 1;
             console.log(
@@ -103,6 +108,10 @@ const useBubbleSort = ({
 
     const finalArr = [...arr].map((bar) => ({ ...bar, coloured: false }));
     changeArr(finalArr);
+    setSteps((prev) => [...prev, finalArr]);
+    setCurrentStep((prev) => prev + 1);
+    currentStepRef.current += 1;
+    totalStepsRef.current += 1;
     sortingRef.current.stop = true;
   };
 
