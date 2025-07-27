@@ -4,6 +4,8 @@ import { sleep } from "../util";
 
 interface BubbleSortProps {
   data: DataBar[];
+  currentStepRef: React.RefObject<number>;
+  totalStepsRef: React.RefObject<number>;
   speedRef: React.RefObject<number>;
   sortingRef: React.RefObject<{ stop: boolean }>;
   pausedRef: React.RefObject<boolean>;
@@ -14,6 +16,8 @@ interface BubbleSortProps {
 
 const useBubbleSort = ({
   data,
+  currentStepRef,
+  totalStepsRef,
   speedRef,
   sortingRef,
   pausedRef,
@@ -48,6 +52,23 @@ const useBubbleSort = ({
             await sleep(50);
           }
 
+          // Bring sort up to latest image before proceeding
+          while (currentStepRef.current < totalStepsRef.current - 1) {
+            setCurrentStep(currentStepRef.current + 1);
+            currentStepRef.current += 1;
+            console.log(
+              `Inside while loop Current step: ${
+                currentStepRef.current
+              }, total steps: ${totalStepsRef.current - 1}`
+            );
+
+            await sleep(100 / speedRef.current);
+          }
+
+          console.log(
+            `Current step: ${currentStepRef.current}, total steps: ${totalStepsRef.current}`
+          );
+
           // Swap
           [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
 
@@ -58,7 +79,21 @@ const useBubbleSort = ({
           changeArr(newArr);
 
           setSteps((prev) => [...prev, newArr]);
+          totalStepsRef.current += 1;
+
+          //
+          /**
+           * TODO: when paused and stepped back or forward,
+           * the steps start from the modified point. So even if
+           * there are 200 steps, current step is 60.
+           * If we are finished, it still only displays step 60 instead
+           * of the finished 200.
+           * So add extra condition, if the current step lower than
+           * total steps, just continue adding steps until they match
+           * before continuing the sort.
+           */
           setCurrentStep((prev) => prev + 1);
+          currentStepRef.current += 1;
 
           // Delay (for speed)
           await sleep(100 / speedRef.current);

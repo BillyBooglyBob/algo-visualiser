@@ -18,6 +18,8 @@ const AlgoVisualiser = () => {
   const speedRef = useRef(speed);
   const sortingRef = useRef({ stop: false });
   const pausedRef = useRef(paused);
+  const currentStepRef = useRef(currentStep);
+  const totalStepsRef = useRef(0);
 
   useEffect(() => {
     speedRef.current = speed;
@@ -33,6 +35,7 @@ const AlgoVisualiser = () => {
     }));
     setData(newData);
     setSteps([newData]);
+    totalStepsRef.current = 1;
     setCurrentStep(0);
   };
 
@@ -54,6 +57,8 @@ const AlgoVisualiser = () => {
   // }, [data, speedRef, sortingRef, pausedRef, setData, setSteps]);
   const handleBubbleSort = useBubbleSort({
     data,
+    currentStepRef,
+    totalStepsRef,
     speedRef,
     sortingRef,
     pausedRef,
@@ -73,8 +78,16 @@ const AlgoVisualiser = () => {
     pausedRef.current = !currentValue;
   };
 
-  const handleStepBackward = () => setCurrentStep((prev) => prev - 1);
-  const handleStepForward = () => setCurrentStep((prev) => prev + 1);
+  const handleStepBackward = () => {
+    const newStep = currentStep - 1;
+    setCurrentStep(newStep);
+    currentStepRef.current = newStep;
+  };
+  const handleStepForward = () => {
+    const newStep = currentStep + 1;
+    setCurrentStep(newStep);
+    currentStepRef.current = newStep;
+  };
 
   return (
     <div className="flex flex-col w-screen h-screen">
@@ -131,8 +144,10 @@ const AlgoVisualiser = () => {
             <StepForward />
           </button>
           <div>
-            Current step: {currentStep} <br />
-            Total steps: {steps.length}
+            Current step: {currentStep + 1} <br />
+            Total steps: {steps.length} <br />
+            Mismtach in steps:{" "}
+            {currentStep < steps.length - 1 ? "true" : "false"}
           </div>
         </div>
       </header>
