@@ -86,6 +86,18 @@ const useQuickSort = ({
           await sleep(50);
         }
 
+        while (currentStepRef.current < totalStepsRef.current - 1) {
+          // Pause on flag
+          while (pausedRef.current) {
+            await sleep(50);
+          }
+
+          setCurrentStep(currentStepRef.current + 1);
+          currentStepRef.current += 1;
+
+          await sleep(100 / speedRef.current);
+        }
+
         [arr[i], arr[j]] = [arr[j], arr[i]];
 
         // TODO: turn below into a single callable
