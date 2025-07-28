@@ -150,7 +150,6 @@ const AlgoVisualiser = () => {
           Size:{" "}
           <input
             type="range"
-            defaultValue={10}
             min={10}
             max={150}
             value={size}
@@ -161,7 +160,6 @@ const AlgoVisualiser = () => {
           Speed:{" "}
           <input
             type="range"
-            defaultValue={1}
             min={1}
             max={50}
             value={speed}
