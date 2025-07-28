@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useBubbleSort from "./algorithm/bubbleSort";
 import {
   Pause,
@@ -9,14 +9,15 @@ import {
   StepForward,
 } from "lucide-react";
 import useQuickSort from "./algorithm/quickSort";
+import { sleep } from "./util";
+import type { DataBar } from "./types";
 
-export interface DataBar {
-  value: number;
-  coloured: boolean;
-}
+// TODO:
+// - Refactor swap
+// - Refactor final swap (discolour everything, can make it into a single sweep)
+// -
 
 const AlgoVisualiser = () => {
-  // TODO: Disable sort button while sorting
   const [data, setData] = useState<DataBar[]>([]);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [steps, setSteps] = useState<DataBar[][]>([]);
@@ -58,40 +59,75 @@ const AlgoVisualiser = () => {
     randomizeData();
   }, [size]);
 
+  const swap = async (i: number, j: number, arr: DataBar[]) => {
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+
+    const newArr = [...arr].map((bar) => ({ ...bar, coloured: false }));
+    newArr[j].coloured = true;
+    newArr[i].coloured = true;
+    setData([...newArr]);
+
+    setSteps((prev) => [...prev, newArr]);
+    totalStepsRef.current += 1;
+    setCurrentStep((prev) => prev + 1);
+    currentStepRef.current += 1;
+
+    // Delay (for speed)
+    await sleep(100 / speedRef.current);
+  };
+
+  const finalClear = async (arr: DataBar[]) => {
+    const finalArr = arr.map((bar) => ({ ...bar, coloured: false }));
+    setData([...finalArr]);
+
+    setSteps((prev) => [...prev, finalArr]);
+    totalStepsRef.current += 1;
+
+    setCurrentStep((prev) => prev + 1);
+    currentStepRef.current += 1;
+
+    sortingRef.current.stop = true;
+  };
+
+  const waitWhilePaused = async () => {
+    while (pausedRef.current) {
+      await sleep(50);
+    }
+  };
+
+  const playToLatestStep = async () => {
+    while (currentStepRef.current < totalStepsRef.current - 1) {
+      await waitWhilePaused();
+
+      setCurrentStep((prev) => prev + 1);
+      currentStepRef.current += 1;
+      await sleep(100 / speedRef.current);
+    }
+  };
+
+  const checkStop = () => {
+    if (sortingRef.current.stop) return true;
+    return false;
+  };
+
   // Memoise to prevent recalculating function on every load
   // - minor performance issue
-  // const handleBubbleSort = useCallback(() => {
-  //   useBubbleSort({
-  //     data,
-  //     speedRef,
-  //     sortingRef,
-  //     pausedRef,
-  //     setData,
-  //     setSteps,
-  //   });
-  // }, [data, speedRef, sortingRef, pausedRef, setData, setSteps]);
   const bubbleSort = useBubbleSort({
     data,
-    currentStepRef,
-    totalStepsRef,
-    speedRef,
-    sortingRef,
-    pausedRef,
-    setData,
-    setSteps,
-    setCurrentStep,
+    swap,
+    finalClear,
+    waitWhilePaused,
+    playToLatestStep,
+    checkStop,
   });
 
   const quickSort = useQuickSort({
     data,
-    currentStepRef,
-    totalStepsRef,
-    speedRef,
-    sortingRef,
-    pausedRef,
-    setData,
-    setSteps,
-    setCurrentStep,
+    swap,
+    finalClear,
+    waitWhilePaused,
+    playToLatestStep,
+    checkStop,
   });
 
   // TODO: Any sort pressed while other active, randomise data and restart
@@ -132,8 +168,8 @@ const AlgoVisualiser = () => {
   // Why -2?
   // Is it because the loop also triggered another one?
   const handleStepToEnd = () => {
-    setCurrentStep(totalStepsRef.current - 2);
-    currentStepRef.current = totalStepsRef.current - 2;
+    setCurrentStep(totalStepsRef.current - 1);
+    currentStepRef.current = totalStepsRef.current - 1;
   };
 
   return (
