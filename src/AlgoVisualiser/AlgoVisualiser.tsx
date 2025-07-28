@@ -16,6 +16,7 @@ export interface DataBar {
 }
 
 const AlgoVisualiser = () => {
+  // TODO: Disable sort button while sorting
   const [data, setData] = useState<DataBar[]>([]);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [steps, setSteps] = useState<DataBar[][]>([]);
@@ -141,10 +142,22 @@ const AlgoVisualiser = () => {
         <h1>Algo Visualiser</h1>
         <button onClick={randomizeData}>Randomize Data</button>
         <div>
-          <button onClick={handleBubbleSort}>Bubble Sort</button>
+          <button
+            disabled={Boolean(currentStepRef.current)}
+            className={`${currentStepRef.current && "brightness-50"}`}
+            onClick={handleBubbleSort}
+          >
+            Bubble Sort
+          </button>
         </div>
         <div>
-          <button onClick={handleQuickSort}>Quick Sort</button>
+          <button
+            disabled={Boolean(currentStepRef.current)}
+            className={`${currentStepRef.current && "brightness-50"}`}
+            onClick={handleQuickSort}
+          >
+            Quick Sort
+          </button>
         </div>
         <div>
           Size:{" "}
