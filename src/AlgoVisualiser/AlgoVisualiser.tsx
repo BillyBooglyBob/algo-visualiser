@@ -94,6 +94,12 @@ const AlgoVisualiser = () => {
     while (currentStepRef.current < totalStepsRef.current - 1) {
       await waitWhilePaused();
 
+      // Add this in case while paused, current step advanced to latest,
+      // which is total steps - 1.
+      // If we continue, current step will === total steps, creating off
+      // by one error.
+      if (currentStepRef.current >= totalStepsRef.current - 1) break;
+
       setCurrentStep((prev) => prev + 1);
       currentStepRef.current += 1;
       await sleep(100 / speedRef.current);

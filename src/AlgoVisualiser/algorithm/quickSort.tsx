@@ -24,21 +24,13 @@ const useQuickSort = ({
 
   const quickSort = async (arr: DataBar[], low: number, high: number) => {
     if (checkStop()) {
-      return -1;
+      return;
     }
+    await waitWhilePaused();
 
     if (low > high) return;
-
     const pivot = await partition(arr, low, high);
-    if (checkStop()) {
-      return;
-    }
-
     await quickSort(arr, low, pivot - 1);
-
-    if (checkStop()) {
-      return;
-    }
     await quickSort(arr, pivot + 1, high);
   };
 
@@ -50,6 +42,8 @@ const useQuickSort = ({
     if (checkStop()) {
       return -1;
     }
+
+    await waitWhilePaused();
 
     // Find the pivot and move it to the front
     const pivot = low + Math.floor(Math.random() * (high - low + 1));
@@ -86,6 +80,7 @@ const useQuickSort = ({
     if (checkStop()) {
       return -1;
     }
+    await waitWhilePaused();
     await swap(low, i - 1, arr);
 
     return i - 1;
