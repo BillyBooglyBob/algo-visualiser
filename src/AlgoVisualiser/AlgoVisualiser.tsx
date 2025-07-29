@@ -12,11 +12,6 @@ import useQuickSort from "./algorithm/quickSort";
 import { sleep } from "./util";
 import type { DataBar } from "./types";
 
-// TODO:
-// - Refactor swap
-// - Refactor final swap (discolour everything, can make it into a single sweep)
-// -
-
 const AlgoVisualiser = () => {
   const [data, setData] = useState<DataBar[]>([]);
   const [currentStep, setCurrentStep] = useState<number>(0);
@@ -110,8 +105,6 @@ const AlgoVisualiser = () => {
     return false;
   };
 
-  // Memoise to prevent recalculating function on every load
-  // - minor performance issue
   const bubbleSort = useBubbleSort({
     data,
     swap,
@@ -130,7 +123,6 @@ const AlgoVisualiser = () => {
     checkStop,
   });
 
-  // TODO: Any sort pressed while other active, randomise data and restart
   const handleBubbleSort = () => {
     sortingRef.current.stop = false;
     bubbleSort();
@@ -147,7 +139,6 @@ const AlgoVisualiser = () => {
     pausedRef.current = !currentValue;
   };
 
-  // TODO: Componentise a lot to prevent repetition
   const handleStepBackward = () => {
     const newStep = currentStep - 1;
     setCurrentStep(newStep);
@@ -165,8 +156,6 @@ const AlgoVisualiser = () => {
     currentStepRef.current = 0;
   };
 
-  // Why -2?
-  // Is it because the loop also triggered another one?
   const handleStepToEnd = () => {
     setCurrentStep(totalStepsRef.current - 1);
     currentStepRef.current = totalStepsRef.current - 1;
@@ -257,14 +246,14 @@ const AlgoVisualiser = () => {
           >
             <SkipForward />
           </button>
-          <div>
+          {/* <div>
             Current step: {currentStep + 1} <br />
             Total steps: {steps.length} <br />
             Mismtach in steps:{" "}
             {currentStep < steps.length - 1 ? "true" : "false"} <br />
             Paused: {paused ? "true" : "false"} <br />
             Paused ref: {pausedRef.current ? "true" : "false"}
-          </div>
+          </div> */}
         </div>
       </header>
       <main className="flex-5 bg-slate-400 flex justify-center w-full">
