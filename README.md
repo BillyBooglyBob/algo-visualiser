@@ -100,3 +100,9 @@ Logic
 
 - Checked by logging the different functions, to check what is continuing to
   run after reset.
+
+- Merge sort difficult to visualise, since the most efficient implementation merges
+  two sorted arr by pushing to an empty arr (using extra space).
+
+It overwrites sections of arr at a time, instead of swapping like bubble or quick sort.
+To visualise, mimic the behaviour. So overwrite one bar at time.

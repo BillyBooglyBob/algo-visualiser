@@ -1,10 +1,10 @@
 import type { DataBar, SortAlgoProps } from "../types";
 /**
- * - Continue splitting into two smaller partitions.
- * - Merge sort each one them
- * - Merge the two together
+ * This version of merge sort does not use swap, instead it overwrites
+ * section of array at a time.
  *
- * - Prefer in-place, can more easily visualise the swap
+ * To visualise this, we just overwrite the existing array one bar at a time,
+ * instead of swapping.
  */
 
 const useMergeSort = ({
@@ -19,7 +19,7 @@ const useMergeSort = ({
 
   const mergeSort = async (arr: DataBar[], low: number, high: number) => {
     await waitWhilePaused();
-    if (checkStop()) {  
+    if (checkStop()) {
       return;
     }
 
