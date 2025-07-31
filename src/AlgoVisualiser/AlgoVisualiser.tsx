@@ -73,7 +73,6 @@ const AlgoVisualiser = () => {
     setCurrentStep((prev) => prev + 1);
     currentStepRef.current += 1;
 
-    console.log("Swapped");
     await sleep(100 / speedRef.current);
   };
 
@@ -281,7 +280,7 @@ const AlgoVisualiser = () => {
           >
             <SkipForward />
           </button>
-          <div>
+          {/* <div>
             Current step: {currentStep + 1} <br />
             Current step ref: {currentStepRef.current + 1} <br />
             Total steps: {steps.length} <br />
@@ -291,7 +290,7 @@ const AlgoVisualiser = () => {
             {currentStep < steps.length - 1 ? "true" : "false"} <br />
             Paused: {paused ? "true" : "false"} <br />
             Paused ref: {pausedRef.current ? "true" : "false"}
-          </div>
+          </div> */}
         </div>
       </header>
       <main className="flex-5 bg-slate-400 flex justify-center w-full">

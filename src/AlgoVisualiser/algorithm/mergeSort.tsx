@@ -19,7 +19,7 @@ const useMergeSort = ({
 
   const mergeSort = async (arr: DataBar[], low: number, high: number) => {
     await waitWhilePaused();
-    if (checkStop()) {
+    if (checkStop()) {  
       return;
     }
 
@@ -64,6 +64,9 @@ const useMergeSort = ({
     for (let k = 0; k < temp.length; k++) {
       const targetIndex = low1 + k;
       if (arr[targetIndex].value !== temp[k].value) {
+        await waitWhilePaused();
+        if (checkStop()) return;
+        await playToLatestStep();
         await swap(targetIndex, targetIndex, arr);
       }
       arr[targetIndex] = temp[k];
