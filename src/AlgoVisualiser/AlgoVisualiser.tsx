@@ -11,6 +11,7 @@ import {
 import useQuickSort from "./algorithm/quickSort";
 import { sleep } from "./util";
 import type { DataBar } from "./types";
+import useMergeSort from "./algorithm/mergeSort";
 
 const AlgoVisualiser = () => {
   const [data, setData] = useState<DataBar[]>([]);
@@ -72,8 +73,7 @@ const AlgoVisualiser = () => {
     setCurrentStep((prev) => prev + 1);
     currentStepRef.current += 1;
 
-    // Delay (for speed)
-    console.log("Swapping");
+    console.log("Swapped");
     await sleep(100 / speedRef.current);
   };
 
@@ -135,6 +135,15 @@ const AlgoVisualiser = () => {
     checkStop,
   });
 
+  const mergeSort = useMergeSort({
+    data,
+    swap,
+    finalClear,
+    waitWhilePaused,
+    playToLatestStep,
+    checkStop,
+  });
+
   const handleBubbleSort = () => {
     sortingRef.current.stop = false;
     bubbleSort();
@@ -143,6 +152,11 @@ const AlgoVisualiser = () => {
   const handleQuickSort = () => {
     sortingRef.current.stop = false;
     quickSort();
+  };
+
+  const handleMergeSort = () => {
+    sortingRef.current.stop = false;
+    mergeSort();
   };
 
   const handlePause = () => {
@@ -194,6 +208,15 @@ const AlgoVisualiser = () => {
             onClick={handleQuickSort}
           >
             Quick Sort
+          </button>
+        </div>
+        <div>
+          <button
+            disabled={Boolean(currentStepRef.current)}
+            className={`${currentStepRef.current && "brightness-50"}`}
+            onClick={handleMergeSort}
+          >
+            Merge Sort
           </button>
         </div>
         <div>
