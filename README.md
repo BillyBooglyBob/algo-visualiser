@@ -76,8 +76,27 @@ Logic
 
 - After finishing two sorts, compared and extracted out common components.
   Created a common type specifying things like:
+
   - dedicated swap
   - final sweep
   - wait indefinitely while paused
   - increment step to latest one at a time until
     at latest step
+
+- Off by one error sometimes in steps when paused, play back then resume.
+
+  - If inside playToLatest step, paused before advancing step. During pause,
+    current step advanced to latest, which is total steps - 1.
+    If we unpause & continue, current step will === total steps, creating off
+    by one error.
+  - Important to add extra check in front
+
+  - Logged every single flag & checked the react dev tools on the state
+
+- Order of checking pause flag and stop flag matters. Lets say we are
+  paused and decided to reset. If pause flag is after stop flag, it will continue
+  executing the current iteration of the sort, overriding the new array with
+  the old array.
+
+- Checked by logging the different functions, to check what is continuing to
+  run after reset.

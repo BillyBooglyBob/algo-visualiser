@@ -23,10 +23,10 @@ const useQuickSort = ({
   const arr = [...data].map((bar) => ({ ...bar }));
 
   const quickSort = async (arr: DataBar[], low: number, high: number) => {
+    await waitWhilePaused();
     if (checkStop()) {
       return;
     }
-    await waitWhilePaused();
 
     if (low > high) return;
     const pivot = await partition(arr, low, high);
@@ -39,11 +39,10 @@ const useQuickSort = ({
     low: number,
     high: number
   ): Promise<number> => {
+    await waitWhilePaused();
     if (checkStop()) {
       return -1;
     }
-
-    await waitWhilePaused();
 
     // Find the pivot and move it to the front
     const pivot = low + Math.floor(Math.random() * (high - low + 1));
@@ -56,11 +55,11 @@ const useQuickSort = ({
 
     for (let j = low + 1; j <= high; j++) {
       if (arr[j].value <= pivotValue) {
+        await waitWhilePaused();
         if (checkStop()) {
           return -1;
         }
 
-        await waitWhilePaused();
         await playToLatestStep();
 
         // This only coloured at most 2 bars at once, since they create a deep
@@ -77,10 +76,10 @@ const useQuickSort = ({
     // so swap this with pivot to bring latter to correct position.
     // Note low is where pivot is placed, since it is swapped there
     // at the start for convenience of swapping
+    await waitWhilePaused();
     if (checkStop()) {
       return -1;
     }
-    await waitWhilePaused();
     await swap(low, i - 1, arr);
 
     return i - 1;

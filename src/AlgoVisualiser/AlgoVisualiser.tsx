@@ -31,11 +31,9 @@ const AlgoVisualiser = () => {
     speedRef.current = speed;
   }, [speed]);
 
-  const randomizeData = () => {
-    setPaused(false);
-    pausedRef.current = false;
-    sortingRef.current.stop = true;
+  // TODO: Make reset work even when paused
 
+  const randomizeData = () => {
     const newData = Array.from({ length: size }, () => ({
       value: Math.floor(Math.random() * 150) + 1,
       coloured: false,
@@ -45,9 +43,16 @@ const AlgoVisualiser = () => {
 
     setSteps([newData]);
     totalStepsRef.current = 1;
+    setPaused(false);
+    pausedRef.current = false;
+    sortingRef.current.stop = true;
 
     setCurrentStep(0);
     currentStepRef.current = 0;
+
+    // Possible issue is when paused, it is still inside execution
+    // of the particular sort. Even when reset, it still runs with the
+    // old array, overriding the new array.
   };
 
   useEffect(() => {
@@ -68,6 +73,7 @@ const AlgoVisualiser = () => {
     currentStepRef.current += 1;
 
     // Delay (for speed)
+    console.log("Swapping");
     await sleep(100 / speedRef.current);
   };
 
@@ -252,14 +258,17 @@ const AlgoVisualiser = () => {
           >
             <SkipForward />
           </button>
-          {/* <div>
+          <div>
             Current step: {currentStep + 1} <br />
+            Current step ref: {currentStepRef.current + 1} <br />
             Total steps: {steps.length} <br />
+            Total steps ref: {totalStepsRef.current} <br />
+            Stop ref: {sortingRef.current.stop ? "true" : "false"} <br />
             Mismtach in steps:{" "}
             {currentStep < steps.length - 1 ? "true" : "false"} <br />
             Paused: {paused ? "true" : "false"} <br />
             Paused ref: {pausedRef.current ? "true" : "false"}
-          </div> */}
+          </div>
         </div>
       </header>
       <main className="flex-5 bg-slate-400 flex justify-center w-full">

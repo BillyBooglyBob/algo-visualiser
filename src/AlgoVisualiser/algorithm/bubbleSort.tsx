@@ -22,12 +22,11 @@ const useBubbleSort = ({
     for (let i = 0; i < n - 1; i++) {
       for (let j = 0; j < n - 1 - i; j++) {
         if (arr[j].value > arr[j + 1].value) {
-          // Stop sort on flag
+          await waitWhilePaused();
           if (checkStop()) {
             return;
           }
 
-          await waitWhilePaused();
           await playToLatestStep();
           await swap(j, j + 1, arr);
         }
