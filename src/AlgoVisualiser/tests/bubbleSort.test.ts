@@ -22,6 +22,30 @@ describe("Bubble Sort", () => {
     };
   });
 
+  it("handles empty array", async () => {
+    const mergeSort = useBubbleSort({
+      ...mockProps,
+      data: [],
+    });
+
+    await mergeSort();
+
+    expect(mockProps.finalClear).toHaveBeenCalledWith([]);
+  });
+
+  it("handles one-element array", async () => {
+    const mergeSort = useBubbleSort({
+      ...mockProps,
+      data: [{ value: 3, coloured: false }],
+    });
+
+    await mergeSort();
+
+    expect(mockProps.finalClear).toHaveBeenCalledWith([
+      { value: 3, coloured: false },
+    ]);
+  });
+
   it("Should sort the array", async () => {
     const bubbleSort = useBubbleSort(mockProps);
 

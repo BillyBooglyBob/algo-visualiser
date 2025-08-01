@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import useQuickSort from "../algorithm/quickSort";
+import useMergeSort from "../algorithm/mergeSort";
 import type { DataBar, SortAlgoProps } from "../types";
 
-describe("Quick Sort", () => {
+describe("Merge Sort", () => {
   let mockProps: SortAlgoProps;
 
   beforeEach(() => {
@@ -10,13 +10,9 @@ describe("Quick Sort", () => {
       data: [
         { value: 3, coloured: false },
         { value: 1, coloured: false },
-        { value: 10, coloured: false },
-        { value: -6, coloured: false },
         { value: 2, coloured: false },
       ],
-      swap: vi.fn(async (i, j, arr) => {
-        if (i < 0 || j < 0 || i >= arr.length || j >= arr.length)
-          throw new Error("Swap indices out of bounds");
+      swap: vi.fn(async (i: number, j: number, arr: any[]) => {
         [arr[i], arr[j]] = [arr[j], arr[i]];
       }),
       finalClear: vi.fn().mockResolvedValue(undefined),
@@ -27,7 +23,7 @@ describe("Quick Sort", () => {
   });
 
   it("handles empty array", async () => {
-    const mergeSort = useQuickSort({
+    const mergeSort = useMergeSort({
       ...mockProps,
       data: [],
     });
@@ -38,7 +34,7 @@ describe("Quick Sort", () => {
   });
 
   it("handles one-element array", async () => {
-    const mergeSort = useQuickSort({
+    const mergeSort = useMergeSort({
       ...mockProps,
       data: [{ value: 3, coloured: false }],
     });
@@ -51,38 +47,15 @@ describe("Quick Sort", () => {
   });
 
   it("Should sort the array", async () => {
-    const quickSort = useQuickSort(mockProps);
+    const mergeSort = useMergeSort(mockProps);
 
-    await quickSort();
+    await mergeSort();
 
     expect(mockProps.finalClear).toHaveBeenCalledWith([
-      { value: -6, coloured: false },
       { value: 1, coloured: false },
       { value: 2, coloured: false },
       { value: 3, coloured: false },
-      { value: 10, coloured: false },
     ]);
-  });
-
-  it("Always choose pivot between [low, high]", async () => {
-    const pivotIndices: number[] = [];
-    const originalSwap = mockProps.swap;
-    mockProps.swap = vi.fn(async (i, j, arr) => {
-      // The first swap in partition swaps low and pivot
-      if (i === 0) {
-        pivotIndices.push(j);
-      }
-      await originalSwap(i, j, arr);
-    });
-
-    const quickSort = useQuickSort(mockProps);
-
-    await quickSort();
-
-    pivotIndices.forEach((pivot) => {
-      expect(pivot).toBeGreaterThanOrEqual(0);
-      expect(pivot).toBeLessThan(mockProps.data.length);
-    });
   });
 
   it("Should maintain array size through sort", async () => {
@@ -97,48 +70,18 @@ describe("Quick Sort", () => {
       swap: mockSwap,
     };
 
-    const quickSort = useQuickSort(props);
-    await quickSort();
+    const mergeSort = useMergeSort(props);
+    await mergeSort();
 
     steps.forEach((step) => {
-      expect(step).toHaveLength(5);
-    });
-  });
-
-  it("Should preserve all original values", async () => {
-    const originalBars: DataBar[] = [
-      { value: 8, coloured: false },
-      { value: 1, coloured: false },
-      { value: 4, coloured: false },
-      { value: 2, coloured: false },
-    ];
-    const originalValues = originalBars.map((bar) => bar.value);
-
-    const steps: number[][] = [];
-
-    const mockSwap = vi.fn(async (i, j, arr: DataBar[]) => {
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-      steps.push(arr.map((bar) => bar.value));
-    });
-
-    const props = {
-      ...mockProps,
-      data: originalBars,
-      swap: mockSwap,
-    };
-
-    const quickSort = useQuickSort(props);
-    await quickSort();
-
-    steps.forEach((step) => {
-      expect(step.sort()).toEqual(originalValues.sort());
+      expect(step).toHaveLength(3);
     });
   });
 
   it("Should respect checkStop signal", async () => {
     mockProps.checkStop = vi.fn().mockReturnValue(true);
-    const quickSort = useQuickSort(mockProps);
-    await quickSort();
+    const mergeSort = useMergeSort(mockProps);
+    await mergeSort();
 
     expect(mockProps.swap).not.toHaveBeenCalled();
   });
@@ -169,8 +112,8 @@ describe("Quick Sort", () => {
       swap: mockSwap,
     };
 
-    const quickSort = useQuickSort(props);
-    const sortPromise = quickSort();
+    const mergeSort = useMergeSort(props);
+    const sortPromise = mergeSort();
 
     await new Promise((r) => setTimeout(r, 10));
 
