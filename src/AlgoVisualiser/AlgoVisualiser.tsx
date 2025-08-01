@@ -32,7 +32,7 @@ const AlgoVisualiser = () => {
     speedRef.current = speed;
   }, [speed]);
 
-  // TODO: Make reset work even when paused
+  // TODO: Test coverage. Test the algorithms work.
 
   const randomizeData = () => {
     const newData = Array.from({ length: size }, () => ({
