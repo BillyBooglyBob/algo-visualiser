@@ -82,7 +82,7 @@ const useMergeSort = ({
     finalClear(arr);
   };
 
-  return handleSort;
+  return { handleSort, merge };
 };
 
 export default useMergeSort;

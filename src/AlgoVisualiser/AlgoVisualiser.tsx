@@ -125,7 +125,7 @@ const AlgoVisualiser = () => {
     checkStop,
   });
 
-  const quickSort = useQuickSort({
+  const { handleSort: quickSort } = useQuickSort({
     data,
     swap,
     finalClear,
@@ -134,7 +134,7 @@ const AlgoVisualiser = () => {
     checkStop,
   });
 
-  const mergeSort = useMergeSort({
+  const { handleSort: mergeSort } = useMergeSort({
     data,
     swap,
     finalClear,

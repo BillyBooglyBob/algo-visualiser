@@ -106,3 +106,13 @@ Logic
 
 It overwrites sections of arr at a time, instead of swapping like bubble or quick sort.
 To visualise, mimic the behaviour. So overwrite one bar at time.
+
+- Tests each algorithm, verify the intermediate sort works as expected.
+  Componentised sort into separate functions, made it more modular and testable.
+
+For quickSort, tested the partition (given section of arr, chooses random pivot &
+moves all value <= to pivot value to the left, rest to the right).
+
+Separate from the actual quickSort.
+
+For mergeSort, tested the merge (merge two sorted arr) separately as well.

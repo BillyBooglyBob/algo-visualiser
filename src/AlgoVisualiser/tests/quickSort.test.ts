@@ -27,23 +27,23 @@ describe("Quick Sort", () => {
   });
 
   it("handles empty array", async () => {
-    const mergeSort = useQuickSort({
+    const { handleSort: quickSort } = useQuickSort({
       ...mockProps,
       data: [],
     });
 
-    await mergeSort();
+    await quickSort();
 
     expect(mockProps.finalClear).toHaveBeenCalledWith([]);
   });
 
   it("handles one-element array", async () => {
-    const mergeSort = useQuickSort({
+    const { handleSort: quickSort } = useQuickSort({
       ...mockProps,
       data: [{ value: 3, coloured: false }],
     });
 
-    await mergeSort();
+    await quickSort();
 
     expect(mockProps.finalClear).toHaveBeenCalledWith([
       { value: 3, coloured: false },
@@ -51,7 +51,7 @@ describe("Quick Sort", () => {
   });
 
   it("Should sort the array", async () => {
-    const quickSort = useQuickSort(mockProps);
+    const { handleSort: quickSort } = useQuickSort(mockProps);
 
     await quickSort();
 
@@ -75,7 +75,7 @@ describe("Quick Sort", () => {
       await originalSwap(i, j, arr);
     });
 
-    const quickSort = useQuickSort(mockProps);
+    const { handleSort: quickSort } = useQuickSort(mockProps);
 
     await quickSort();
 
@@ -83,6 +83,29 @@ describe("Quick Sort", () => {
       expect(pivot).toBeGreaterThanOrEqual(0);
       expect(pivot).toBeLessThan(mockProps.data.length);
     });
+  });
+
+  it("Partition should work", async () => {
+    const data: DataBar[] = [
+      { value: 2, coloured: false },
+      { value: 5, coloured: false },
+      { value: 1, coloured: false },
+      { value: 4, coloured: false },
+      { value: 30, coloured: false },
+    ];
+
+    const { partition } = useQuickSort(mockProps);
+
+    const partitionIndex = await partition(data, 0, data.length - 1);
+    const partitionValue = data[partitionIndex].value;
+
+    for (let i = 0; i <= partitionIndex; i++) {
+      expect(data[i].value).toBeLessThanOrEqual(partitionValue);
+    }
+
+    for (let j = partitionIndex + 1; j < data.length; j++) {
+      expect(data[j].value).toBeGreaterThan(partitionValue);
+    }
   });
 
   it("Should maintain array size through sort", async () => {
@@ -97,7 +120,7 @@ describe("Quick Sort", () => {
       swap: mockSwap,
     };
 
-    const quickSort = useQuickSort(props);
+    const { handleSort: quickSort } = useQuickSort(props);
     await quickSort();
 
     steps.forEach((step) => {
@@ -127,7 +150,7 @@ describe("Quick Sort", () => {
       swap: mockSwap,
     };
 
-    const quickSort = useQuickSort(props);
+    const { handleSort: quickSort } = useQuickSort(props);
     await quickSort();
 
     steps.forEach((step) => {
@@ -137,7 +160,7 @@ describe("Quick Sort", () => {
 
   it("Should respect checkStop signal", async () => {
     mockProps.checkStop = vi.fn().mockReturnValue(true);
-    const quickSort = useQuickSort(mockProps);
+    const { handleSort: quickSort } = useQuickSort(mockProps);
     await quickSort();
 
     expect(mockProps.swap).not.toHaveBeenCalled();
@@ -169,7 +192,7 @@ describe("Quick Sort", () => {
       swap: mockSwap,
     };
 
-    const quickSort = useQuickSort(props);
+    const { handleSort: quickSort } = useQuickSort(props);
     const sortPromise = quickSort();
 
     await new Promise((r) => setTimeout(r, 10));

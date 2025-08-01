@@ -95,7 +95,7 @@ const useQuickSort = ({
     finalClear(arr);
   };
 
-  return handleSort;
+  return { handleSort, partition };
 };
 
 export default useQuickSort;

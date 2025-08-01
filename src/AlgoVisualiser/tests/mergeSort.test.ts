@@ -23,7 +23,7 @@ describe("Merge Sort", () => {
   });
 
   it("handles empty array", async () => {
-    const mergeSort = useMergeSort({
+    const { handleSort: mergeSort } = useMergeSort({
       ...mockProps,
       data: [],
     });
@@ -34,7 +34,7 @@ describe("Merge Sort", () => {
   });
 
   it("handles one-element array", async () => {
-    const mergeSort = useMergeSort({
+    const { handleSort: mergeSort } = useMergeSort({
       ...mockProps,
       data: [{ value: 3, coloured: false }],
     });
@@ -47,7 +47,7 @@ describe("Merge Sort", () => {
   });
 
   it("Should sort the array", async () => {
-    const mergeSort = useMergeSort(mockProps);
+    const { handleSort: mergeSort } = useMergeSort(mockProps);
 
     await mergeSort();
 
@@ -70,7 +70,7 @@ describe("Merge Sort", () => {
       swap: mockSwap,
     };
 
-    const mergeSort = useMergeSort(props);
+    const { handleSort: mergeSort } = useMergeSort(props);
     await mergeSort();
 
     steps.forEach((step) => {
@@ -78,9 +78,31 @@ describe("Merge Sort", () => {
     });
   });
 
+  it("Should merge two separate sorted arr correctly", async () => {
+    const data: DataBar[] = [
+      { value: 2, coloured: false },
+      { value: 5, coloured: false }, // first half
+      { value: 1, coloured: false },
+      { value: 4, coloured: false }, // second half
+    ];
+
+    const { merge } = useMergeSort(mockProps);
+
+    await merge(
+      data,
+      0,
+      1, // low1 to high1
+      2,
+      3 // low2 to high2
+    );
+
+    const values = data.map((bar) => bar.value);
+    expect(values).toEqual([1, 2, 4, 5]);
+  });
+
   it("Should respect checkStop signal", async () => {
     mockProps.checkStop = vi.fn().mockReturnValue(true);
-    const mergeSort = useMergeSort(mockProps);
+    const { handleSort: mergeSort } = useMergeSort(mockProps);
     await mergeSort();
 
     expect(mockProps.swap).not.toHaveBeenCalled();
@@ -112,7 +134,7 @@ describe("Merge Sort", () => {
       swap: mockSwap,
     };
 
-    const mergeSort = useMergeSort(props);
+    const { handleSort: mergeSort } = useMergeSort(props);
     const sortPromise = mergeSort();
 
     await new Promise((r) => setTimeout(r, 10));
