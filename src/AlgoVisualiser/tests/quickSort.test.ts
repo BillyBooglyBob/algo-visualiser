@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import useBubbleSort from "../algorithm/bubbleSort";
+import useQuickSort from "../algorithm/quickSort";
 import type { DataBar, SortAlgoProps } from "../types";
 
-describe("Bubble Sort", () => {
+describe("Quick Sort", () => {
   let mockProps: SortAlgoProps;
 
   beforeEach(() => {
@@ -10,9 +10,13 @@ describe("Bubble Sort", () => {
       data: [
         { value: 3, coloured: false },
         { value: 1, coloured: false },
+        { value: 10, coloured: false },
+        { value: -6, coloured: false },
         { value: 2, coloured: false },
       ],
-      swap: vi.fn(async (i: number, j: number, arr: any[]) => {
+      swap: vi.fn(async (i, j, arr) => {
+        if (i < 0 || j < 0 || i >= arr.length || j >= arr.length)
+          throw new Error("Swap indices out of bounds");
         [arr[i], arr[j]] = [arr[j], arr[i]];
       }),
       finalClear: vi.fn().mockResolvedValue(undefined),
@@ -23,28 +27,38 @@ describe("Bubble Sort", () => {
   });
 
   it("Should sort the array", async () => {
-    const bubbleSort = useBubbleSort(mockProps);
+    const quickSort = useQuickSort(mockProps);
 
-    await bubbleSort();
-
-    expect(mockProps.swap).toHaveBeenCalledTimes(2);
-    expect(mockProps.swap).toHaveBeenNthCalledWith(1, 0, 1, expect.any(Array));
-    expect(mockProps.swap).toHaveBeenNthCalledWith(2, 1, 2, expect.any(Array));
+    await quickSort();
 
     expect(mockProps.finalClear).toHaveBeenCalledWith([
+      { value: -6, coloured: false },
       { value: 1, coloured: false },
       { value: 2, coloured: false },
       { value: 3, coloured: false },
+      { value: 10, coloured: false },
     ]);
   });
 
-  it("Should call swap with correct indices for bubble sort", async () => {
-    const bubbleSort = useBubbleSort(mockProps);
-    await bubbleSort();
+  it("Always choose pivot between [low, high]", async () => {
+    const pivotIndices: number[] = [];
+    const originalSwap = mockProps.swap;
+    mockProps.swap = vi.fn(async (i, j, arr) => {
+      // The first swap in partition swaps low and pivot
+      if (i === 0) {
+        pivotIndices.push(j);
+      }
+      await originalSwap(i, j, arr);
+    });
 
-    // Verify the sequence of swaps
-    expect(mockProps.swap).toHaveBeenCalledWith(0, 1, expect.any(Array));
-    expect(mockProps.swap).toHaveBeenCalledWith(1, 2, expect.any(Array));
+    const quickSort = useQuickSort(mockProps);
+
+    await quickSort();
+
+    pivotIndices.forEach((pivot) => {
+      expect(pivot).toBeGreaterThanOrEqual(0);
+      expect(pivot).toBeLessThan(mockProps.data.length);
+    });
   });
 
   it("Should maintain array size through sort", async () => {
@@ -59,31 +73,11 @@ describe("Bubble Sort", () => {
       swap: mockSwap,
     };
 
-    const bubbleSort = useBubbleSort(props);
-    await bubbleSort();
+    const quickSort = useQuickSort(props);
+    await quickSort();
 
     steps.forEach((step) => {
-      expect(step).toHaveLength(3);
-    });
-  });
-
-  it("Should only swap adjacent elements", async () => {
-    const steps: { i: number; j: number }[] = [];
-    const mockSwap = vi.fn(async (i, j, arr) => {
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-      steps.push({ i, j });
-    });
-
-    const props = {
-      ...mockProps,
-      swap: mockSwap,
-    };
-
-    const bubbleSort = useBubbleSort(props);
-    await bubbleSort();
-
-    steps.forEach(({ i, j }) => {
-      expect(Math.abs(i - j)).toBe(1);
+      expect(step).toHaveLength(5);
     });
   });
 
@@ -109,8 +103,8 @@ describe("Bubble Sort", () => {
       swap: mockSwap,
     };
 
-    const bubbleSort = useBubbleSort(props);
-    await bubbleSort();
+    const quickSort = useQuickSort(props);
+    await quickSort();
 
     steps.forEach((step) => {
       expect(step.sort()).toEqual(originalValues.sort());
@@ -119,8 +113,8 @@ describe("Bubble Sort", () => {
 
   it("Should respect checkStop signal", async () => {
     mockProps.checkStop = vi.fn().mockReturnValue(true);
-    const bubbleSort = useBubbleSort(mockProps);
-    await bubbleSort();
+    const quickSort = useQuickSort(mockProps);
+    await quickSort();
 
     expect(mockProps.swap).not.toHaveBeenCalled();
   });
@@ -151,8 +145,8 @@ describe("Bubble Sort", () => {
       swap: mockSwap,
     };
 
-    const bubbleSort = useBubbleSort(props);
-    const sortPromise = bubbleSort();
+    const quickSort = useQuickSort(props);
+    const sortPromise = quickSort();
 
     await new Promise((r) => setTimeout(r, 10));
 
